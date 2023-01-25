@@ -43,15 +43,15 @@ var Brain = (function () {
             }
         }
     }
-
+    // чтобы запустить network, вызывается метод Htink для каждого уровня
     //make each layer in the network 'think' (generate output values)
     Brain.prototype.Think = function () {
         for (var i = 0; i < this.Layers.length; i++) {
             this.Layers[i].Think();
         }
     };
-
-    //train an output neuron with some inputdata. The inputdata is considered a good example for the output neuron.
+    // Обучение
+    //обучить выходной нейрон с некоторыми входными данными. Входные данные считаются хорошим примером для выходного нейрона.
     Brain.prototype.Train = function (inputData, outputNeuron) {
 
         //no layers, no glory
@@ -59,18 +59,18 @@ var Brain = (function () {
             return;
         }
 
-        //fill the first layer with input data to feed the network
+        //заполните первый слой входными данными, чтобы обучить сеть
         var inputLayer = this.Layers[0];
         for (var i = 0; i < inputData.length; i++) {
             inputLayer.Neurons[i].AxonValue = inputData[i];
         }
 
-        //generate output for the given inputs
+        //генерировать вывод для заданных входов
         this.Think();
 
-        //adjust weights using the delta 
-        //the generated output is compared to the training input: the drawing in this case.
-        //the subtraction is the error which will be corrected by adjusting the weight. 
+        //корректировать веса с помощью дельты
+        //сгенерированный вывод сравнивается с обучающим вводом: в данном случае рисунок.
+        //вычитание - это ошибка, которая будет исправлена ​​путем корректировки веса.
         var delta = 0;
         var learningRate = 0.01;
         for (var i = 0; i < outputNeuron.Dendrites.length; i++) {
@@ -97,8 +97,8 @@ var Layer = (function () {
             this.Neurons.push(new Neuron());
         }
     }
-
-    //make all neurons in the layer generate an output value
+    // 3 каждый слой вызывает метод Think нейрона
+    //заставить все нейроны в слое генерировать выходное значение
     Layer.prototype.Think = function () {
         for (var i = 0; i < this.Neurons.length; i++) {
             this.Neurons[i].Think();
@@ -143,18 +143,18 @@ var Layer = (function () {
 }
 )();
 
-//a neuron is the calculation unit and is responsible for generating an output value.
+// класс нейрон является вычислительной единицей и отвечает за генерацию выходного значения.
 var Neuron = (function () {
 
-    //neuron constructor. They have names for easy retrieval.
+    //конструктор нейронов. У них есть имена для легкого поиска.
     function Neuron(name) {
         this.Name = name;
         this.Dendrites = [];
         this.AxonValue = 0.5;
     }
 
-    //generate an output value based on the input values multiplied by the corresponding weights.
-    //the output value is always between 0 and 1 because of the sigmoid function (http://en.wikipedia.org/wiki/Sigmoid_function)
+    //генерировать выходное значение на основе входных значений, умноженных на соответствующие веса.
+    //выходное значение всегда находится между 0 и 1 из-за сигмовидной функции (http://en.wikipedia.org/wiki/Sigmoid_function)
     Neuron.prototype.Think = function () {
         var sum = 0;
         if (this.Dendrites.length > 0) {
@@ -162,7 +162,7 @@ var Neuron = (function () {
                 sum += this.Dendrites[i].SourceNeuron.AxonValue * this.Dendrites[i].Weight;
             }
 
-            //apply sigmoid function to transform the sum to a value between 0 and 1
+            //применить сигмовидную функцию для преобразования суммы в значение от 0 до 1
             //AxonValue is just a sexy name.
             this.AxonValue = 1 / (1 + Math.exp(-sum));
         }
